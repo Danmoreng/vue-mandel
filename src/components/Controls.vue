@@ -2,8 +2,8 @@
   <div class="side-panel">
     <button class="resetButton" v-on:click="reset">Reset</button>
     <div class="inputGroup">
-      <label>Width: {{ store.width }}</label>
-      <label>Height: {{ store.height }}</label>
+      <label>Width: {{ store.renderWidth }}</label>
+      <label>Height: {{ store.renderHeight }}</label>
     </div>
 
     <label>Color Map:</label>

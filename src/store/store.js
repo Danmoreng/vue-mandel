@@ -2,8 +2,10 @@ import { defineStore } from "pinia";
 
 export const useStore = defineStore("store", {
   state: () => ({
-    width: 200,
-    height: 200,
+    clientWidth: 200,
+    clientHeight: 200,
+    renderWidth: 200,
+    renderHeight: 200,
     uniform: {
       width: 0,
       height: 0,
