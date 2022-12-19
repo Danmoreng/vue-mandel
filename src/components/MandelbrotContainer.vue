@@ -59,9 +59,9 @@ onMounted(() => {
   myCanvas.value.addEventListener("mousemove", (e) => {
     if (store.mousedown) {
       const deltaX =
-        ((store.currentMousePoint.x - e.x) / store.width) * store.zoomSize;
+        ((store.currentMousePoint.x - e.x) / store.clientWidth) * store.zoomSize;
       const deltaY =
-        ((store.currentMousePoint.y - e.y) / store.height) * store.zoomSize;
+        ((store.currentMousePoint.y - e.y) / store.clientHeight) * store.zoomSize;
       store.currentMousePoint.x = e.x;
       store.currentMousePoint.y = e.y;
       store.zoomCenter[0] += deltaX;
@@ -120,8 +120,8 @@ onMounted(() => {
       store.currentTouchPoint.y = e.touches[0].clientY;
 
       // Pan the image based on the distance the touch point has moved
-      store.zoomCenter[0] -= (deltaX / store.width) * store.zoomSize;
-      store.zoomCenter[1] += (deltaY / store.height) * store.zoomSize;
+      store.zoomCenter[0] -= (deltaX / store.clientWidth) * store.zoomSize;
+      store.zoomCenter[1] += (deltaY / store.clientHeight) * store.zoomSize;
     }
   });
 
@@ -157,12 +157,15 @@ function resize() {
   // Fix Canvas CSS size to fit screen
   myCanvas.value.style.width = window.visualViewport.width + 'px';
   myCanvas.value.style.height = window.visualViewport.height + 'px';
+  // Store client width and height for zoom & pan interactions
+  store.clientWidth = window.visualViewport.width;
+  store.clientHeight = window.visualViewport.height;
   // Scale Cavas Render Size to match devicePixelRatio
-  store.width = Math.floor(window.visualViewport.width * devicePixelRatio);
-  store.height = Math.floor(window.visualViewport.height * devicePixelRatio);
-  gl.uniform1f(store.uniform.width, store.width);
-  gl.uniform1f(store.uniform.height, store.height);
-  gl.viewport(0, 0, store.width, store.height);
+  store.renderWidth = Math.floor(window.visualViewport.width * devicePixelRatio);
+  store.renderHeight = Math.floor(window.visualViewport.height * devicePixelRatio);
+  gl.uniform1f(store.uniform.width, store.renderWidth);
+  gl.uniform1f(store.uniform.height, store.renderHeight);
+  gl.viewport(0, 0, store.renderWidth, store.renderHeight);
   setTimeout(() => {
     renderFrame();
   }, 500);
@@ -193,7 +196,7 @@ window.addEventListener("resize", resize);
 </script>
 
 <template>
-  <canvas ref="myCanvas" :width="store.width" :height="store.height"></canvas>
+  <canvas ref="myCanvas" :width="store.renderWidth" :height="store.renderHeight"></canvas>
 </template>
 
 <style scoped>
