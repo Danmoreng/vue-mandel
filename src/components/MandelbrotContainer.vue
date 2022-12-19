@@ -154,8 +154,12 @@ function updateZoom(delta) {
 }
 
 function resize() {
-  store.height = window.visualViewport.height;
-  store.width = window.visualViewport.width;
+  // Fix Canvas CSS size to fit screen
+  myCanvas.value.style.width = window.visualViewport.width + 'px';
+  myCanvas.value.style.height = window.visualViewport.height + 'px';
+  // Scale Cavas Render Size to match devicePixelRatio
+  store.width = Math.floor(window.visualViewport.width * devicePixelRatio);
+  store.height = Math.floor(window.visualViewport.height * devicePixelRatio);
   gl.uniform1f(store.uniform.width, store.width);
   gl.uniform1f(store.uniform.height, store.height);
   gl.viewport(0, 0, store.width, store.height);
