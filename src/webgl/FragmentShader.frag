@@ -69,18 +69,15 @@ void main() {
     vec2 c = u_zoomCenter + (uv * 4.0 - vec2(2.0)) * (u_zoomSize / 4.0);
     c.y *= u_height/u_width;
     vec2 x = vec2(0.0);
-    bool escaped = false;
     int iterations = 0;
     for (int i = 0; i < 10000; i++) {
         if (i > u_maxIterations) break;
         iterations = i;
         x = f(x, c);
         if (length(x) > 2.0) {
-            escaped = true;
             break;
         }
     }
-    // gl_FragColor = escaped ? vec4(palette(float(iterations)/float(u_maxIterations), vec3(0.0), vec3(0.59, 0.55, 0.75), vec3(0.1, 0.2, 0.3), vec3(0.75)), 1.0) : vec4(vec3(0.85, 0.99, 1.0), 1.0);
     float val = 1.0 - float(iterations)/float(u_maxIterations);
     gl_FragColor = vec4(color_map(val, u_colorMap), 1.0);
 }

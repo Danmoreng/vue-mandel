@@ -9,7 +9,12 @@ const myCanvas = ref(null);
 let gl = null;
 
 onMounted(() => {
-  gl = myCanvas.value.getContext("webgl");
+  if(window.visualViewport.width < 500) {
+    store.showControls = false;
+  }
+  gl = myCanvas.value.getContext('webgl', { powerPreference: "high-performance" });
+  const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+  store.usedGPU = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(vertexShader, vertexShaderRaw);

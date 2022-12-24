@@ -1,6 +1,5 @@
 <template>
-  <div class="side-panel">
-    <button class="resetButton" v-on:click="reset">Reset</button>
+  <div class="side-panel" v-show="store.showControls">
     <div class="inputGroup">
       <label>Width: {{ store.renderWidth }}</label>
       <label>Height: {{ store.renderHeight }}</label>
@@ -39,12 +38,12 @@
       :value="store.customIterations"
       v-on:change="setCustomIterations"
     />
-    <p>
-      Repository:
-      <a href="https://github.com/Danmoreng/vue-mandel"
-        >https://github.com/Danmoreng/vue-mandel</a
-      >
-    </p>
+    <div class="inputGroup">
+      <label>GPU:</label>
+      <span>{{ store.usedGPU }}</span>
+    </div>
+    <label>Repository:</label>
+    <span> <a href="https://github.com/Danmoreng/vue-mandel">https://github.com/Danmoreng/vue-mandel</a></span>
   </div>
 </template>
 
@@ -61,14 +60,6 @@ function setCustomIterations(event) {
 function setColorMap(index) {
   store.colorMap = index;
 }
-
-function reset() {
-  store.zoomCenter[0] = 0;
-  store.zoomCenter[1] = 0;
-  store.zoomSize = 5.0;
-  store.maxIterations = 100;
-  store.customIterations = 0;
-}
 </script>
 
 <style scoped>
@@ -77,11 +68,12 @@ function reset() {
   border-radius: 20px;
   padding: 20px;
   position: absolute;
-  top: 5px;
+  top: 50px;
   right: 5px;
   background: rgba(0, 0, 0, 0.5);
   font-family: "Helvetica", sans-serif;
   color: white;
+  max-width: 350px;
 }
 
 a {
@@ -91,6 +83,7 @@ a {
 .inputGroup {
   display: flex;
   align-items: stretch;
+  margin-bottom: 10px;
 }
 
 label {
@@ -114,12 +107,6 @@ input[type="number"] {
   width: 100%;
 }
 
-.resetButton {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-}
-
 .color-button {
   display: inline-block;
   margin: 0 0.5em 0.5em 0;
@@ -135,5 +122,9 @@ input[type="number"] {
   cursor: pointer;
   user-select: none;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.gpuName {
+  max-width: 300px;
 }
 </style>
