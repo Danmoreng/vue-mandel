@@ -6,6 +6,8 @@ export const useStore = defineStore("store", {
     clientHeight: 200,
     renderWidth: 200,
     renderHeight: 200,
+    usedGPU: "",
+    showControls: true,
     uniform: {
       width: 0,
       height: 0,
