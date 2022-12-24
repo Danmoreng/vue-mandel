@@ -73,7 +73,9 @@ function setColorMap(index) {
   background: rgba(0, 0, 0, 0.5);
   font-family: "Helvetica", sans-serif;
   color: white;
-  max-width: 350px;
+  max-width: min(350px, calc(100vw - 10px));
+  max-height: calc(100vh - 100px);
+  overflow: auto;
 }
 
 a {
@@ -122,9 +124,5 @@ input[type="number"] {
   cursor: pointer;
   user-select: none;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-}
-
-.gpuName {
-  max-width: 300px;
 }
 </style>
