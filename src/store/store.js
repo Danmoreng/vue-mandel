@@ -12,6 +12,7 @@ export const useStore = defineStore("store", {
       width: 0,
       height: 0,
       zoomCenter: 0,
+      zoomCenterD: 0,
       zoomSize: 0,
       maxIterations: 0,
       colorMap: 0,
