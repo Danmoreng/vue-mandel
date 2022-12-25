@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useStore } from "@/store/store";
-import fragmentShaderRaw from "../webgl/FragmentShader.frag?raw";
+import fragmentShaderRaw from "../webgl/FragmentShaderDouble.frag?raw";
 import vertexShaderRaw from "../webgl/VertexShader.vert?raw";
 
 const store = useStore();
@@ -173,7 +173,7 @@ function resize() {
   gl.viewport(0, 0, store.renderWidth, store.renderHeight);
   setTimeout(() => {
     renderFrame();
-  }, 500);
+  }, 1500);
 }
 
 // let frameCounter = 0;
@@ -183,9 +183,15 @@ function renderFrame() {
   /* bind inputs & render frame */
   gl.uniform2f(
     store.uniform.zoomCenter,
-    store.zoomCenter[0],
-    store.zoomCenter[1]
+    Math.fround(store.zoomCenter[0]),
+    Math.fround(store.zoomCenter[1])
   );
+  gl.uniform2f(
+    store.uniform.zoomCenterD,
+    store.zoomCenter[0] - Math.fround(store.zoomCenter[0]),
+    store.zoomCenter[1] - Math.fround(store.zoomCenter[1])
+  );
+
   gl.uniform1f(store.uniform.zoomSize, store.zoomSize);
   gl.uniform1i(store.uniform.maxIterations, store.maxIterations);
   let colorCode = store.colorMap;
