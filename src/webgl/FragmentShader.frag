@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform vec2 u_zoomCenter;
+uniform vec2 u_zoomCenterDouble;
 uniform float u_zoomSize;
 uniform int u_maxIterations;
 uniform int u_colorMap;
@@ -9,11 +10,9 @@ uniform float u_width;
 uniform float u_height;
 
 vec2 f(vec2 x, vec2 c) {
-    return mat2(x, -x.y, x.x)*x + c;
+    return vec2(x.x * x.x - x.y * x.y, 2.0 * x.x * x.y) + c;
 }
-vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
-    return a + b*cos(6.28318*(c*t+d));
-}
+
 vec3 viridis(float t) {
     const vec3 c0 = vec3(0.2777273272234177, 0.005407344544966578, 0.3340998053353061);
     const vec3 c1 = vec3(0.1050930431085774, 1.404613529898575, 1.384590162594685);
@@ -63,20 +62,19 @@ vec3 color_map(float t, int m) {
     }
 }
 
-
 void main() {
     vec2 uv = gl_FragCoord.xy / vec2(u_width, u_height);
     vec2 c = u_zoomCenter + (uv * 4.0 - vec2(2.0)) * (u_zoomSize / 4.0);
-    c.y *= u_height/u_width;
+    c.y *= u_height / u_width;
+
     vec2 x = vec2(0.0);
     int iterations = 0;
+
     for (int i = 0; i < 10000; i++) {
-        if (i > u_maxIterations) break;
-        iterations = i;
+        if (i >= u_maxIterations) break;
         x = f(x, c);
-        if (length(x) > 2.0) {
-            break;
-        }
+        if (dot(x, x) > 4.0) break;
+        iterations = i;
     }
     float val = 1.0 - float(iterations)/float(u_maxIterations);
     gl_FragColor = vec4(color_map(val, u_colorMap), 1.0);

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useStore } from "@/store/store";
-import fragmentShaderRaw from "../webgl/FragmentShaderDouble.frag?raw";
+import fragmentShaderRaw from "../webgl/FragmentShader.frag?raw";
 import vertexShaderRaw from "../webgl/VertexShader.vert?raw";
 
 const store = useStore();
