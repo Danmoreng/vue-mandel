@@ -21,6 +21,7 @@ export const useStore = defineStore("store", {
     invertColorMap: false,
     zoomCenter: [0, 0],
     zoomSize: 5.0,
+    zoomSizeInverted: 1 / 5.0,
     maxIterations: 100,
     customIterations: 0,
     mandelbrotProgram: null,
