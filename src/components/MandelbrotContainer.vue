@@ -153,6 +153,7 @@ function updateZoom(delta) {
   } else {
     store.zoomSize += store.zoomSize / 10;
   }
+  store.zoomSizeInverted = Math.floor(1 / store.zoomSize * 100) / 100;
   if (store.customIterations === 0) {
     store.calcIterations();
   }

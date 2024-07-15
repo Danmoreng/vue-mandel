@@ -29,7 +29,7 @@
     <input type="number" v-model="store.zoomCenter[1]" />
     <div>
       <label>Zoom Size:</label>
-      <input type="number" v-model="store.zoomSize" />
+      <input type="number" v-model="store.zoomSizeInverted" @change="zoomChange" />
     </div>
     <label>Iterations: {{ store.maxIterations }}</label>
     <label>Custom Iterations:</label>
@@ -60,6 +60,11 @@ function setCustomIterations(event) {
 function setColorMap(index) {
   store.colorMap = index;
 }
+
+function zoomChange() {
+  store.zoomSize = 1 / store.zoomSizeInverted;
+}
+
 </script>
 
 <style scoped>
