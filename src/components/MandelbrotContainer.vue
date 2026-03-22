@@ -1,7 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useStore } from "@/store/store";
-import { createWebGLRenderer } from "@/renderers/webgl/renderer";
+import { createWebGL2Renderer } from "@/renderers/webgl2/renderer";
 
 const store = useStore();
 const myCanvas = ref(null);
@@ -24,7 +24,7 @@ onMounted(() => {
     store.showControls = false;
   }
 
-  renderer = createWebGLRenderer();
+  renderer = createWebGL2Renderer();
 
   try {
     const rendererInfo = renderer.init(myCanvas.value);

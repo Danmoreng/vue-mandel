@@ -1,13 +1,14 @@
+#version 300 es
 precision highp float;
 
 uniform vec2 u_zoomCenter;
-uniform vec2 u_zoomCenterDouble;
 uniform float u_zoomSize;
 uniform int u_maxIterations;
 uniform int u_colorMap;
-uniform bool u_inverted;
 uniform float u_width;
 uniform float u_height;
+
+out vec4 outColor;
 
 vec2 f(vec2 x, vec2 c) {
     return vec2(x.x * x.x - x.y * x.y, 2.0 * x.x * x.y) + c;
@@ -77,5 +78,5 @@ void main() {
         iterations = i;
     }
     float val = 1.0 - float(iterations)/float(u_maxIterations);
-    gl_FragColor = vec4(color_map(val, u_colorMap), 1.0);
+    outColor = vec4(color_map(val, u_colorMap), 1.0);
 }
