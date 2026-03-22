@@ -42,9 +42,36 @@
       :value="store.customIterations"
       v-on:change="setCustomIterations"
     />
+    <label>Renderer:</label>
+    <div class="inputGroup rendererButtons">
+      <button
+        v-for="backend in rendererOptions"
+        :key="backend.value"
+        class="renderer-button"
+        :class="{
+          active: store.rendererBackend === backend.value,
+          disabled: backend.disabled,
+        }"
+        :disabled="backend.disabled"
+        @click="setRendererBackend(backend.value)"
+      >
+        {{ backend.label }}
+      </button>
+    </div>
+    <div class="inputGroup">
+      <label>Active Renderer:</label>
+      <span>{{ rendererLabel }}</span>
+    </div>
+    <div class="inputGroup">
+      <label>WebGPU:</label>
+      <span>{{ webgpuStatus }}</span>
+    </div>
     <div class="inputGroup">
       <label>GPU:</label>
       <span>{{ store.usedGPU }}</span>
+    </div>
+    <div v-if="store.rendererError" class="errorMessage">
+      {{ store.rendererError }}
     </div>
     <label>Repository:</label>
     <span>
@@ -56,6 +83,8 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { rendererLabels } from "@/renderers";
 import { useStore } from "@/store/store";
 
 defineOptions({
@@ -64,6 +93,24 @@ defineOptions({
 
 const store = useStore();
 const colorMaps = ["Viridis", "Inferno", "Plasma"];
+const rendererOptions = computed(() => [
+  {
+    value: "webgl2",
+    label: "WebGL2",
+    disabled: !store.capabilities.webgl2,
+  },
+  {
+    value: "webgpu",
+    label: "WebGPU",
+    disabled: !store.capabilities.webgpu,
+  },
+]);
+const rendererLabel = computed(
+  () => rendererLabels[store.rendererBackend] ?? store.rendererBackend
+);
+const webgpuStatus = computed(() =>
+  store.capabilities.webgpu ? "Available" : "Unavailable"
+);
 
 function setCustomIterations(event) {
   store.setCustomIterations(event.target.value);
@@ -71,6 +118,18 @@ function setCustomIterations(event) {
 
 function setColorMap(index) {
   store.colorMap = index;
+}
+
+function setRendererBackend(backend) {
+  if (backend === "webgpu" && !store.capabilities.webgpu) {
+    return;
+  }
+
+  if (backend === "webgl2" && !store.capabilities.webgl2) {
+    return;
+  }
+
+  store.setRendererBackend(backend);
 }
 
 function zoomChange() {
@@ -102,6 +161,11 @@ a {
   display: flex;
   align-items: stretch;
   margin-bottom: 10px;
+}
+
+.rendererButtons {
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 label {
@@ -140,5 +204,34 @@ input[type="number"] {
   cursor: pointer;
   user-select: none;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.renderer-button {
+  display: inline-block;
+  padding: 0.65em 1.2em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.25em;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 0.95em;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease-in-out, opacity 0.15s ease-in-out;
+}
+
+.renderer-button.active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.renderer-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  margin-bottom: 10px;
+  color: #ff8a8a;
+  font-weight: 700;
 }
 </style>

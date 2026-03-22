@@ -40,12 +40,20 @@ Out of scope for this phase:
 The current app:
 
 - uses `src/components/MandelbrotContainer.vue` as a backend-agnostic canvas and interaction container
+- detects renderer capabilities through `src/renderers/index.js`
 - uses `src/renderers/webgl2/renderer.js` as the current renderer implementation
+- includes a WebGPU renderer implementation in `src/renderers/webgpu/renderer.js`
 - imports raw GLSL shader strings from `src/webgl/FragmentShader.frag` and `src/webgl/VertexShader.vert`
 - keeps application render state in Pinia while GPU resources live inside the renderer module
 - contains an unused or incomplete double-precision shader path
 
-This means the initial refactor boundary and the WebGL2 baseline are both in place, but the project still has only one active backend and still needs the WebGPU and selection milestones.
+This means the initial refactor boundary, the WebGL2 baseline, backend capability detection, the WebGPU renderer, and the runtime selection UI are all in place. The remaining milestone is cleanup of dead precision code and stale assets.
+
+Current runtime status:
+
+- WebGL2 is working in-browser.
+- WebGPU is working in-browser behind the selector UI.
+- Canvas recreation is required when switching context families.
 
 ## Target Architecture
 
@@ -190,6 +198,10 @@ Deliverable:
 
 - capability detection feeding renderer selection logic
 
+Status:
+
+- implemented
+
 ### Phase 4: Add WebGPU backend
 
 Objective:
@@ -207,6 +219,10 @@ Tasks:
 Deliverable:
 
 - selectable WebGPU backend
+
+Status:
+
+- implemented
 
 Acceptance criteria:
 
@@ -235,6 +251,10 @@ Behavior:
 Deliverable:
 
 - runtime backend selector in the controls panel
+
+Status:
+
+- implemented
 
 ### Phase 6: Remove dead double-precision path
 

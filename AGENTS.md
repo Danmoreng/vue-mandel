@@ -40,8 +40,10 @@ Notes:
 - `src/components/Controls.vue`: side panel for color map selection, zoom inputs, custom iteration override, and GPU info display.
 - `src/store/store.js`: shared render state and iteration helper logic.
 - `src/renderers/`: rendering backend implementations and shared renderer helpers.
+- `src/renderers/index.js`: renderer registry, backend labels, and capability detection.
 - `src/webgl/`: active GLSL assets for the WebGL2 backend.
-- `src/webgpu/`: currently unused exploratory shader asset.
+- `src/renderers/webgpu/`: active WebGPU backend implementation and WGSL shader.
+- `src/webgpu/`: older exploratory shader asset not used by the active backend.
 - `plans/`: source documentation for architecture and roadmap decisions.
 - `docs/`: committed production build output.
 
@@ -51,7 +53,7 @@ Notes:
 
 1. `src/main.js` mounts `App.vue` with a Pinia store.
 2. `App.vue` renders the canvas container and the control panel side by side.
-3. `MandelbrotContainer.vue` creates the active renderer on mount, wires interactions, and forwards resize and render calls.
+3. `MandelbrotContainer.vue` detects backend capabilities, creates the active renderer, wires interactions, and forwards resize and render calls.
 4. UI events mutate Pinia state.
 5. `store.$subscribe()` in `MandelbrotContainer.vue` schedules `renderFrame()` via `requestAnimationFrame`, so most store updates trigger a redraw through the active renderer.
 
@@ -63,6 +65,8 @@ Notes:
 - Current zoom center and zoom size
 - Current iteration count and optional custom override
 - Color-map selection and inversion flag
+- Selected renderer backend and backend capability flags
+- Non-fatal renderer initialization error text
 - GPU renderer label
 
 `calcIterations()` derives iteration count from zoom level when the user is not forcing a custom value. `setCustomIterations()` is the intended entry point for updating the override from the controls panel.
@@ -83,6 +87,19 @@ Notes:
 - Uses a fullscreen triangle `[-1, -1, 3, -1, -1, 3]` rather than a quad.
 - Resolves and writes the current shader uniforms before drawing.
 
+`src/renderers/index.js` currently:
+
+- Detects `webgl2` and WebGPU support at startup.
+- Chooses the preferred backend from the available capabilities.
+- Provides the shared factory entry point for renderer creation.
+
+`src/renderers/webgpu/renderer.js` currently:
+
+- Creates a WebGPU adapter, device, canvas context, uniform buffer, bind group, and render pipeline.
+- Uses `src/renderers/webgpu/mandelbrot.wgsl` for the single-precision Mandelbrot shader path.
+- Matches the existing fullscreen-triangle rendering model used by the WebGL2 backend.
+- Recreates the canvas when switching between WebGL2 and WebGPU so each backend gets a fresh context family.
+
 Interaction model:
 
 - Mouse wheel zooms in or out.
@@ -102,6 +119,13 @@ The active fragment shader is `src/webgl/FragmentShader.frag`. It:
 - Uses GLSL ES 3.00 syntax for the WebGL2 pipeline.
 
 `Controls.vue` relies on this encoding by setting base indices `0`, `2`, and `4`, then incrementing by one when `store.invertColorMap` is true.
+
+It also exposes the runtime renderer selector:
+
+- `WebGL2` is the baseline option.
+- `WebGPU` is selectable only when capability detection marks it available.
+- Backend initialization failures surface through `store.rendererError`, and the container falls back to `WebGL2` when possible.
+- WebGPU drag/pan orientation is aligned with the WebGL2 coordinate system.
 
 ## Current Caveats
 
