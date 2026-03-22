@@ -39,13 +39,13 @@ Out of scope for this phase:
 
 The current app:
 
-- creates a `webgl` context in `src/components/MandelbrotContainer.vue`
+- uses `src/components/MandelbrotContainer.vue` as a backend-agnostic canvas and interaction container
+- uses `src/renderers/webgl/renderer.js` as the current renderer implementation
 - imports raw GLSL shader strings from `src/webgl/FragmentShader.frag` and `src/webgl/VertexShader.vert`
-- drives rendering directly from the Vue component
-- stores render state and uniform handles in Pinia
+- keeps application render state in Pinia while GPU resources live inside the renderer module
 - contains an unused or incomplete double-precision shader path
 
-This means the current rendering, resource management, browser capability handling, and interaction wiring are too tightly coupled to extend cleanly.
+This means the initial refactor boundary is in place, but the project still has only one active backend and still needs the WebGL2 and WebGPU milestones.
 
 ## Target Architecture
 
@@ -134,6 +134,10 @@ Tasks:
 Deliverable:
 
 - one renderer implementation behind a clean interface
+
+Status:
+
+- implemented
 
 ### Phase 2: Upgrade the baseline renderer to WebGL2
 

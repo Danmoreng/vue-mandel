@@ -8,15 +8,6 @@ export const useStore = defineStore("store", {
     renderHeight: 200,
     usedGPU: "",
     showControls: true,
-    uniform: {
-      width: 0,
-      height: 0,
-      zoomCenter: 0,
-      zoomCenterD: 0,
-      zoomSize: 0,
-      maxIterations: 0,
-      colorMap: 0,
-    },
     colorMap: 0,
     invertColorMap: false,
     zoomCenter: [0, 0],
@@ -24,15 +15,6 @@ export const useStore = defineStore("store", {
     zoomSizeInverted: 1 / 5.0,
     maxIterations: 100,
     customIterations: 0,
-    mandelbrotProgram: null,
-    currentMousePoint: {
-      x: 0,
-      y: 0,
-    },
-    currentTouchPoint: {
-      x: 0,
-      y: 0,
-    },
   }),
   actions: {
     calcIterations() {
