@@ -29,7 +29,11 @@
     <input type="number" v-model="store.zoomCenter[1]" />
     <div>
       <label>Zoom Size:</label>
-      <input type="number" v-model="store.zoomSizeInverted" @change="zoomChange" />
+      <input
+        type="number"
+        v-model="store.zoomSizeInverted"
+        @change="zoomChange"
+      />
     </div>
     <label>Iterations: {{ store.maxIterations }}</label>
     <label>Custom Iterations:</label>
@@ -43,12 +47,20 @@
       <span>{{ store.usedGPU }}</span>
     </div>
     <label>Repository:</label>
-    <span> <a href="https://github.com/Danmoreng/vue-mandel">https://github.com/Danmoreng/vue-mandel</a></span>
+    <span>
+      <a href="https://github.com/Danmoreng/vue-mandel"
+        >https://github.com/Danmoreng/vue-mandel</a
+      ></span
+    >
   </div>
 </template>
 
 <script setup>
 import { useStore } from "@/store/store";
+
+defineOptions({
+  name: "ControlPanel",
+});
 
 const store = useStore();
 const colorMaps = ["Viridis", "Inferno", "Plasma"];
@@ -64,7 +76,6 @@ function setColorMap(index) {
 function zoomChange() {
   store.zoomSize = 1 / store.zoomSizeInverted;
 }
-
 </script>
 
 <style scoped>
