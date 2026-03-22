@@ -6,6 +6,12 @@ export const useStore = defineStore("store", {
     clientHeight: 200,
     renderWidth: 200,
     renderHeight: 200,
+    rendererBackend: "webgl2",
+    capabilities: {
+      webgl2: false,
+      webgpu: false,
+    },
+    rendererError: "",
     usedGPU: "",
     showControls: true,
     colorMap: 0,
@@ -33,6 +39,15 @@ export const useStore = defineStore("store", {
         this.maxIterations = value;
       }
       this.customIterations = value;
+    },
+    setCapabilities(value) {
+      this.capabilities = value;
+    },
+    setRendererBackend(value) {
+      this.rendererBackend = value;
+    },
+    setRendererError(value) {
+      this.rendererError = value;
     },
   },
 });
