@@ -25,14 +25,22 @@
       />
     </div>
     <label>Zoom Center:</label>
-    <input type="number" v-model="store.zoomCenter[0]" />
-    <input type="number" v-model="store.zoomCenter[1]" />
+    <input
+      type="number"
+      :value="store.zoomCenter[0]"
+      @change="setZoomCenter(0, $event.target.value)"
+    />
+    <input
+      type="number"
+      :value="store.zoomCenter[1]"
+      @change="setZoomCenter(1, $event.target.value)"
+    />
     <div>
       <label>Zoom Size:</label>
       <input
         type="number"
-        v-model="store.zoomSizeInverted"
-        @change="zoomChange"
+        :value="store.zoomSizeInverted"
+        @change="setZoomSizeInverted($event.target.value)"
       />
     </div>
     <label>Iterations: {{ store.maxIterations }}</label>
@@ -65,6 +73,10 @@
     <div class="inputGroup">
       <label>WebGPU:</label>
       <span>{{ webgpuStatus }}</span>
+    </div>
+    <div class="inputGroup">
+      <label>Status:</label>
+      <span>{{ rendererStatus }}</span>
     </div>
     <div class="inputGroup">
       <label>GPU:</label>
@@ -111,6 +123,21 @@ const rendererLabel = computed(
 const webgpuStatus = computed(() =>
   store.capabilities.webgpu ? "Available" : "Unavailable"
 );
+const rendererStatus = computed(() => {
+  if (!store.capabilitiesChecked) {
+    return "Detecting";
+  }
+
+  if (store.unsupportedBrowser) {
+    return "Unsupported";
+  }
+
+  if (store.rendererError) {
+    return "Fallback Active";
+  }
+
+  return "Ready";
+});
 
 function setCustomIterations(event) {
   store.setCustomIterations(event.target.value);
@@ -118,6 +145,14 @@ function setCustomIterations(event) {
 
 function setColorMap(index) {
   store.colorMap = index;
+}
+
+function setZoomCenter(index, value) {
+  store.setZoomCenter(index, value);
+}
+
+function setZoomSizeInverted(value) {
+  store.setZoomSizeInverted(value);
 }
 
 function setRendererBackend(backend) {
@@ -130,10 +165,6 @@ function setRendererBackend(backend) {
   }
 
   store.setRendererBackend(backend);
-}
-
-function zoomChange() {
-  store.zoomSize = 1 / store.zoomSizeInverted;
 }
 </script>
 

@@ -72,10 +72,7 @@ export function createWebGL2Renderer() {
         throw new Error("WebGL2 is not supported in this browser.");
       }
 
-      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-      gpuName = debugInfo
-        ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-        : "WebGL2 Renderer";
+      gpuName = gl.getParameter(gl.RENDERER) || "WebGL2 Renderer";
 
       program = createProgram(gl, vertexShaderRaw, fragmentShaderRaw);
       gl.useProgram(program);

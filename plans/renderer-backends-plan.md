@@ -40,20 +40,22 @@ Out of scope for this phase:
 The current app:
 
 - uses `src/components/MandelbrotContainer.vue` as a backend-agnostic canvas and interaction container
+- uses `src/composables/useCanvasInteractions.js` for pointer, wheel, and touch handling
 - detects renderer capabilities through `src/renderers/index.js`
 - uses `src/renderers/webgl2/renderer.js` as the current renderer implementation
 - includes a WebGPU renderer implementation in `src/renderers/webgpu/renderer.js`
 - imports raw GLSL shader strings from `src/webgl/FragmentShader.frag` and `src/webgl/VertexShader.vert`
 - keeps application render state in Pinia while GPU resources live inside the renderer module
-- contains an unused or incomplete double-precision shader path
+- includes lightweight Vitest coverage for store logic and backend selection helpers
 
-This means the initial refactor boundary, the WebGL2 baseline, backend capability detection, the WebGPU renderer, and the runtime selection UI are all in place. The remaining milestone is cleanup of dead precision code and stale assets.
+This means the initial refactor boundary, the WebGL2 baseline, backend capability detection, the WebGPU renderer, the runtime selection UI, and the cleanup pass are all in place.
 
 Current runtime status:
 
 - WebGL2 is working in-browser.
 - WebGPU is working in-browser behind the selector UI.
 - Canvas recreation is required when switching context families.
+- Basic automated tests are in place.
 
 ## Target Architecture
 
@@ -273,6 +275,10 @@ Deliverable:
 
 - cleaner single-precision dual-backend codebase
 
+Status:
+
+- implemented
+
 ## UI Expectations
 
 The controls panel should include a renderer section:
@@ -360,6 +366,7 @@ Expected behavior:
 Run:
 
 - `npm run lint`
+- `npm run test`
 - `npm run build`
 
 Rebuild `docs/` whenever the deployment artifact needs to be updated.

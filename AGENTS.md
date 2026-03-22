@@ -23,6 +23,7 @@ Run these from the repo root:
 - `npm run build`
 - `npm run preview`
 - `npm run lint`
+- `npm run test`
 
 Notes:
 
@@ -38,12 +39,13 @@ Notes:
 - `src/App.vue`: top-level shell, reset button, controls toggle, and component composition.
 - `src/components/MandelbrotContainer.vue`: owns the canvas, interaction wiring, resize logic, and renderer lifecycle.
 - `src/components/Controls.vue`: side panel for color map selection, zoom inputs, custom iteration override, and GPU info display.
+- `src/composables/useCanvasInteractions.js`: shared pointer, wheel, and touch interaction logic for the canvas.
 - `src/store/store.js`: shared render state and iteration helper logic.
 - `src/renderers/`: rendering backend implementations and shared renderer helpers.
 - `src/renderers/index.js`: renderer registry, backend labels, and capability detection.
 - `src/webgl/`: active GLSL assets for the WebGL2 backend.
 - `src/renderers/webgpu/`: active WebGPU backend implementation and WGSL shader.
-- `src/webgpu/`: older exploratory shader asset not used by the active backend.
+- `src/store/*.test.js`, `src/renderers/*.test.js`: minimal Vitest coverage for store logic and backend selection helpers.
 - `plans/`: source documentation for architecture and roadmap decisions.
 - `docs/`: committed production build output.
 
@@ -98,7 +100,6 @@ Notes:
 - Creates a WebGPU adapter, device, canvas context, uniform buffer, bind group, and render pipeline.
 - Uses `src/renderers/webgpu/mandelbrot.wgsl` for the single-precision Mandelbrot shader path.
 - Matches the existing fullscreen-triangle rendering model used by the WebGL2 backend.
-- Recreates the canvas when switching between WebGL2 and WebGPU so each backend gets a fresh context family.
 
 Interaction model:
 
@@ -131,10 +132,8 @@ It also exposes the runtime renderer selector:
 
 These are existing repo behaviors. Do not accidentally “fix” them without confirming intent and testing the result.
 
-- Only the single-precision WebGL fragment shader is wired into the app. `src/webgl/FragmentShaderDouble.frag` exists but is not imported by `MandelbrotContainer.vue`.
-- `src/webgpu/VertexShader.wgsl` is not referenced anywhere in the app.
-- The reset button in `App.vue` resets `zoomSize` and iteration fields, but it does not also recompute `zoomSizeInverted`.
-- There is no automated test suite in the repo today.
+- Switching between WebGL2 and WebGPU recreates the canvas so each backend gets a fresh context family.
+- The test suite is intentionally small and currently focuses on store logic and backend-selection helpers, not renderer output parity.
 
 ## Change Guidance
 
@@ -149,9 +148,11 @@ These are existing repo behaviors. Do not accidentally “fix” them without co
 Because there are no tests, validation is mostly command-based and manual:
 
 - Run `npm run lint`.
+- Run `npm run test`.
 - Run `npm run build`.
 - If you changed runtime behavior, verify in `npm run dev`:
   - initial render appears
+  - renderer switching still works
   - wheel zoom still works
   - drag and touch pan still work
   - color map and invert controls still redraw correctly

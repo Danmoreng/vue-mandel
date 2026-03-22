@@ -2,7 +2,6 @@ import shaderCode from "@/renderers/webgpu/mandelbrot.wgsl?raw";
 import { getColorCode } from "@/renderers/types";
 
 const UNIFORM_BUFFER_SIZE = 32;
-const GPU_BUFFER_USAGE = window.GPUBufferUsage;
 
 function getAdapterDescription(adapter) {
   const description = adapter.info?.description?.trim();
@@ -61,7 +60,7 @@ export function createWebGPURenderer() {
 
       uniformBuffer = device.createBuffer({
         size: UNIFORM_BUFFER_SIZE,
-        usage: GPU_BUFFER_USAGE.UNIFORM | GPU_BUFFER_USAGE.COPY_DST,
+        usage: window.GPUBufferUsage.UNIFORM | window.GPUBufferUsage.COPY_DST,
       });
 
       const shaderModule = device.createShaderModule({

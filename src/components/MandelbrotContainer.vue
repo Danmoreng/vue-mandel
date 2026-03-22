@@ -5,6 +5,7 @@ import {
   detectRendererCapabilities,
   getPreferredRendererBackend,
 } from "@/renderers";
+import { useCanvasInteractions } from "@/composables/useCanvasInteractions";
 import { useStore } from "@/store/store";
 
 const store = useStore();
@@ -16,16 +17,16 @@ let initialRenderTimeout = null;
 let isMounted = false;
 let suppressBackendWatcher = false;
 let canvasHasContext = false;
-let mouseDown = false;
-const currentMousePoint = {
-  x: 0,
-  y: 0,
-};
-const currentTouchPoint = {
-  x: 0,
-  y: 0,
-};
-let initialTouchDistance = 0;
+const {
+  handleWheel,
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+  resetInteractionState,
+} = useCanvasInteractions(store);
 
 onMounted(() => {
   isMounted = true;
@@ -56,9 +57,7 @@ onBeforeUnmount(() => {
   }
 
   window.removeEventListener("resize", resize);
-  mouseDown = false;
-  initialTouchDistance = 0;
-
+  resetInteractionState();
   disposeRenderer();
 });
 
@@ -80,100 +79,6 @@ function getViewportSize() {
   };
 }
 
-function handleWheel(event) {
-  updateZoom(event.deltaY * -1);
-}
-
-function handleMouseDown(event) {
-  currentMousePoint.x = event.x;
-  currentMousePoint.y = event.y;
-  mouseDown = true;
-}
-
-function handleMouseMove(event) {
-  if (!mouseDown) {
-    return;
-  }
-
-  const deltaX =
-    ((currentMousePoint.x - event.x) / store.clientWidth) * store.zoomSize;
-  const deltaY =
-    ((currentMousePoint.y - event.y) / store.clientHeight) * store.zoomSize;
-
-  currentMousePoint.x = event.x;
-  currentMousePoint.y = event.y;
-  store.zoomCenter[0] += deltaX;
-  store.zoomCenter[1] -= deltaY;
-}
-
-function handleMouseUp() {
-  mouseDown = false;
-}
-
-function handleTouchStart(event) {
-  if (event.touches.length >= 2) {
-    const x1 = event.touches[0].clientX;
-    const y1 = event.touches[0].clientY;
-    const x2 = event.touches[1].clientX;
-    const y2 = event.touches[1].clientY;
-
-    initialTouchDistance = Math.sqrt(
-      Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)
-    );
-    return;
-  }
-
-  currentTouchPoint.x = event.touches[0].clientX;
-  currentTouchPoint.y = event.touches[0].clientY;
-}
-
-function handleTouchMove(event) {
-  if (event.touches.length >= 2) {
-    const x1 = event.touches[0].clientX;
-    const y1 = event.touches[0].clientY;
-    const x2 = event.touches[1].clientX;
-    const y2 = event.touches[1].clientY;
-    const currentTouchDistance = Math.sqrt(
-      Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)
-    );
-    const delta = currentTouchDistance - initialTouchDistance;
-
-    initialTouchDistance = currentTouchDistance;
-    updateZoom(delta);
-    return;
-  }
-
-  if (event.touches.length !== 1) {
-    return;
-  }
-
-  const deltaX = event.touches[0].clientX - currentTouchPoint.x;
-  const deltaY = event.touches[0].clientY - currentTouchPoint.y;
-
-  currentTouchPoint.x = event.touches[0].clientX;
-  currentTouchPoint.y = event.touches[0].clientY;
-  store.zoomCenter[0] -= (deltaX / store.clientWidth) * store.zoomSize;
-  store.zoomCenter[1] += (deltaY / store.clientHeight) * store.zoomSize;
-}
-
-function handleTouchEnd() {
-  initialTouchDistance = 0;
-  currentTouchPoint.x = 0;
-  currentTouchPoint.y = 0;
-}
-
-function updateZoom(delta) {
-  if (delta > 0) {
-    store.zoomSize -= store.zoomSize / 10;
-  } else {
-    store.zoomSize += store.zoomSize / 10;
-  }
-  store.zoomSizeInverted = Math.floor((1 / store.zoomSize) * 100) / 100;
-  if (store.customIterations === 0) {
-    store.calcIterations();
-  }
-}
-
 async function initializeRendererCapabilities() {
   const capabilities = await detectRendererCapabilities();
   if (!isMounted) {
@@ -188,6 +93,7 @@ async function initializeRendererCapabilities() {
 
   if (!preferredBackend) {
     store.usedGPU = "";
+    store.setUnsupportedBrowser(true);
     store.setRendererError(
       "This browser does not support the WebGL2 baseline."
     );
@@ -206,6 +112,7 @@ async function activateRenderer(requestedBackend) {
   if (!preferredBackend) {
     disposeRenderer();
     store.usedGPU = "";
+    store.setUnsupportedBrowser(true);
     store.setRendererError(
       "This browser does not support the WebGL2 baseline."
     );
@@ -222,9 +129,11 @@ async function activateRenderer(requestedBackend) {
   }
 
   store.setRendererError("");
+  store.setUnsupportedBrowser(false);
 
+  let nextRenderer = null;
   try {
-    const nextRenderer = createRenderer(preferredBackend);
+    nextRenderer = createRenderer(preferredBackend);
     canvasHasContext = true;
     const rendererInfo = await nextRenderer.init(myCanvas.value);
 
@@ -234,6 +143,7 @@ async function activateRenderer(requestedBackend) {
     resize();
   } catch (error) {
     console.error(error);
+    nextRenderer?.dispose();
     disposeRenderer();
 
     if (preferredBackend !== "webgl2" && store.capabilities.webgl2) {
@@ -298,7 +208,11 @@ function resize() {
 }
 
 function renderFrame() {
-  renderer?.render(store);
+  if (!renderer) {
+    return;
+  }
+
+  renderer.render(store);
 }
 </script>
 
