@@ -48,7 +48,7 @@ function createProgram(gl, vertexSource, fragmentSource) {
  *   getInfo: () => { backend: string, gpuName: string }
  * }}
  */
-export function createWebGLRenderer() {
+export function createWebGL2Renderer() {
   let gl = null;
   let program = null;
   let vertexBuffer = null;
@@ -57,7 +57,6 @@ export function createWebGLRenderer() {
     width: null,
     height: null,
     zoomCenter: null,
-    zoomCenterD: null,
     zoomSize: null,
     maxIterations: null,
     colorMap: null,
@@ -65,18 +64,18 @@ export function createWebGLRenderer() {
 
   return {
     init(canvas) {
-      gl = canvas.getContext("webgl", {
+      gl = canvas.getContext("webgl2", {
         powerPreference: "high-performance",
       });
 
       if (!gl) {
-        throw new Error("WebGL is not supported in this browser.");
+        throw new Error("WebGL2 is not supported in this browser.");
       }
 
       const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
       gpuName = debugInfo
         ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-        : "WebGL Renderer";
+        : "WebGL2 Renderer";
 
       program = createProgram(gl, vertexShaderRaw, fragmentShaderRaw);
       gl.useProgram(program);
@@ -123,11 +122,6 @@ export function createWebGLRenderer() {
         Math.fround(state.zoomCenter[0]),
         Math.fround(state.zoomCenter[1])
       );
-      gl.uniform2f(
-        uniforms.zoomCenterD,
-        state.zoomCenter[0] - Math.fround(state.zoomCenter[0]),
-        state.zoomCenter[1] - Math.fround(state.zoomCenter[1])
-      );
       gl.uniform1f(uniforms.zoomSize, state.zoomSize);
       gl.uniform1i(uniforms.maxIterations, state.maxIterations);
       gl.uniform1i(uniforms.colorMap, getColorCode(state));
@@ -161,7 +155,7 @@ export function createWebGLRenderer() {
 
     getInfo() {
       return {
-        backend: "webgl",
+        backend: "webgl2",
         gpuName,
       };
     },

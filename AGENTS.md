@@ -40,7 +40,7 @@ Notes:
 - `src/components/Controls.vue`: side panel for color map selection, zoom inputs, custom iteration override, and GPU info display.
 - `src/store/store.js`: shared render state and iteration helper logic.
 - `src/renderers/`: rendering backend implementations and shared renderer helpers.
-- `src/webgl/`: active GLSL assets.
+- `src/webgl/`: active GLSL assets for the WebGL2 backend.
 - `src/webgpu/`: currently unused exploratory shader asset.
 - `plans/`: source documentation for architecture and roadmap decisions.
 - `docs/`: committed production build output.
@@ -72,12 +72,12 @@ Notes:
 `src/components/MandelbrotContainer.vue` is the core of the app:
 
 - Owns the canvas element, local pointer/touch interaction state, and redraw scheduling.
-- Uses `src/renderers/webgl/renderer.js` as the current renderer backend.
+- Uses `src/renderers/webgl2/renderer.js` as the current renderer backend.
 - Keeps the canvas CSS size aligned with `window.visualViewport` and scales the backing buffer by `devicePixelRatio`.
 
-`src/renderers/webgl/renderer.js` currently:
+`src/renderers/webgl2/renderer.js` currently:
 
-- Creates a `webgl` context with `powerPreference: "high-performance"`.
+- Creates a `webgl2` context with `powerPreference: "high-performance"`.
 - Reads `WEBGL_debug_renderer_info` when available to expose the renderer name in the UI.
 - Imports `src/webgl/VertexShader.vert` and `src/webgl/FragmentShader.frag` with `?raw`.
 - Uses a fullscreen triangle `[-1, -1, 3, -1, -1, 3]` rather than a quad.
@@ -99,6 +99,7 @@ The active fragment shader is `src/webgl/FragmentShader.frag`. It:
 - Iterates `z = z^2 + c` up to `u_maxIterations`.
 - Selects one of three polynomial color maps: Viridis, Inferno, or Plasma.
 - Uses even color-map indices for normal palettes and odd indices for inverted palettes.
+- Uses GLSL ES 3.00 syntax for the WebGL2 pipeline.
 
 `Controls.vue` relies on this encoding by setting base indices `0`, `2`, and `4`, then incrementing by one when `store.invertColorMap` is true.
 
