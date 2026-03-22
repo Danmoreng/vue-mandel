@@ -17,7 +17,9 @@ function reset() {
 
 <template>
   <button class="resetButton" v-on:click="reset">Reset</button>
-  <button class="controlsButton" v-on:click="toggleControls">Show/Hide Controls</button>
+  <button class="controlsButton" v-on:click="toggleControls">
+    Show/Hide Controls
+  </button>
   <main>
     <MandelbrotContainer />
     <Controls></Controls>

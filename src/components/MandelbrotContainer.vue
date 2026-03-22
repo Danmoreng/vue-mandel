@@ -9,11 +9,13 @@ const myCanvas = ref(null);
 let gl = null;
 
 onMounted(() => {
-  if(window.visualViewport.width < 500) {
+  if (window.visualViewport.width < 500) {
     store.showControls = false;
   }
-  gl = myCanvas.value.getContext('webgl', { powerPreference: "high-performance" });
-  const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+  gl = myCanvas.value.getContext("webgl", {
+    powerPreference: "high-performance",
+  });
+  const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
   store.usedGPU = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -64,9 +66,11 @@ onMounted(() => {
   myCanvas.value.addEventListener("mousemove", (e) => {
     if (store.mousedown) {
       const deltaX =
-        ((store.currentMousePoint.x - e.x) / store.clientWidth) * store.zoomSize;
+        ((store.currentMousePoint.x - e.x) / store.clientWidth) *
+        store.zoomSize;
       const deltaY =
-        ((store.currentMousePoint.y - e.y) / store.clientHeight) * store.zoomSize;
+        ((store.currentMousePoint.y - e.y) / store.clientHeight) *
+        store.zoomSize;
       store.currentMousePoint.x = e.x;
       store.currentMousePoint.y = e.y;
       store.zoomCenter[0] += deltaX;
@@ -153,7 +157,7 @@ function updateZoom(delta) {
   } else {
     store.zoomSize += store.zoomSize / 10;
   }
-  store.zoomSizeInverted = Math.floor(1 / store.zoomSize * 100) / 100;
+  store.zoomSizeInverted = Math.floor((1 / store.zoomSize) * 100) / 100;
   if (store.customIterations === 0) {
     store.calcIterations();
   }
@@ -161,14 +165,18 @@ function updateZoom(delta) {
 
 function resize() {
   // Fix Canvas CSS size to fit screen
-  myCanvas.value.style.width = window.visualViewport.width + 'px';
-  myCanvas.value.style.height = window.visualViewport.height + 'px';
+  myCanvas.value.style.width = window.visualViewport.width + "px";
+  myCanvas.value.style.height = window.visualViewport.height + "px";
   // Store client width and height for zoom & pan interactions
   store.clientWidth = window.visualViewport.width;
   store.clientHeight = window.visualViewport.height;
   // Scale Cavas Render Size to match devicePixelRatio
-  store.renderWidth = Math.floor(window.visualViewport.width * devicePixelRatio);
-  store.renderHeight = Math.floor(window.visualViewport.height * devicePixelRatio);
+  store.renderWidth = Math.floor(
+    window.visualViewport.width * devicePixelRatio
+  );
+  store.renderHeight = Math.floor(
+    window.visualViewport.height * devicePixelRatio
+  );
   gl.uniform1f(store.uniform.width, store.renderWidth);
   gl.uniform1f(store.uniform.height, store.renderHeight);
   gl.viewport(0, 0, store.renderWidth, store.renderHeight);
@@ -208,7 +216,11 @@ window.addEventListener("resize", resize);
 </script>
 
 <template>
-  <canvas ref="myCanvas" :width="store.renderWidth" :height="store.renderHeight"></canvas>
+  <canvas
+    ref="myCanvas"
+    :width="store.renderWidth"
+    :height="store.renderHeight"
+  ></canvas>
 </template>
 
 <style scoped>
