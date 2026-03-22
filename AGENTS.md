@@ -4,6 +4,8 @@
 
 This repository is a small Vue 3 + Vite Mandelbrot viewer. The app renders the fractal in a full-screen WebGL canvas and exposes navigation and rendering controls through a side panel. State is centralized in Pinia and shader source is imported as raw text at build time.
 
+Project roadmap and renderer migration decisions live in `docs/renderer-backends-plan.md`. Keep `AGENTS.md` focused on repository workflow and implementation guidance rather than long-lived product planning.
+
 ## Stack
 
 - Vue 3 with `<script setup>`
